@@ -1,15 +1,19 @@
-# Lab-4: Visualize real world data on Azure IoT Central
+# Lab-4: 실제 데이터를 Azure IoT Hub와 Azure IoT Central과 연동하기
 
-- Go to [Home Page](README.md)
+- [Home Page](README.md)로 돌아가기
 
-## Goals
+## 목적
 
+- UART API / 실제센서 DHT-11/22 붙여보기
+- Direct Method 한 번 해보자
+- Direct Method 는 IoT Central 에서 지원 안하지 않나
+- IoT Hub 에서만 지원?
 - Hands-on with Azure IoT Central configuration
 - Understand the basic feature of IoT Central offered as a IoT SaaS solution
 - Get familiar with I2C API to connect to external sensor device
 - Use Azure Sphere and Azure IoT Central work together to build a secured end-to-end solution with telemtery collection, visulization and remote control ability.
 
-## Steps
+## 단계
 
 1. After connect Azure Sphere development board to your PC, enable device debug and disable OTA in Azure Sphere utility by:
    
@@ -93,7 +97,7 @@
 
 15. Follow this [page](https://github.com/xiongyu0523/azure-sphere-samples/blob/master/Samples/AzureIoT/IoTCentral.md#add-new-measurements-settings-and-properties) to configure IoT Central application to visulize a state `Orientation` report from device and use toggle setting to control LED1.
 
-## Read more
+## 더 보기
 
 - [What is Azure IoT Central](https://docs.microsoft.com/en-us/azure/iot-central/overview-iot-central)
 - [Azure IoT Central Architecture](https://docs.microsoft.com/en-us/azure/iot-central/concepts-architecture)
