@@ -19,9 +19,7 @@
     - Add a enrollment group in DPS to provision Azure Sphere devices
     - Azure Sphere 디바이스를 등록하기 위해 DPS에 Enrollment 그룹을 추가합니다.
 
-> Azure IoT Hub DPS service do not allow to use free subscription, You should use a pay-as-you-go subscription for this lab.
-
-> Azure IoT Hub DPS 서비스는 무료구독으로 사용할 수 없습니다. 실습에서는 Pay-as-you-go 구독으로 사용합니다.
+    > - Azure IoT Hub DPS 서비스는 무료구독으로 사용할 수 없습니다. 실습에서는 Pay-as-you-go 구독으로 사용합니다.
 
 2. Azure Sphere 개발보드를 PC에 연결하고 Azure Sphere utility 에서 디바이스를 디버그 모드로 전환합니다. (OTA는 비활성화)    
    `azsphere device prep-debug`
@@ -46,12 +44,9 @@
    *AzureIoT.sln* 솔루션 파일을 선택합니다.
    프로젝트를 빌드하기 전에 3가지 필수 정보를 *app_manifest.json* 파일에 입력을 해줍니다.
 
-   1. The Tenant ID for your Azure Sphere device
    1. Azure Sphere 디바이스의 Tenant ID
-   2. The Scope ID for your device provisioning service (DPS) instance
-   1. Device Provisioning Service(DPS) 인스턴스의 Scope ID
-   3. The Azure IoT Hub URL for your IoT hub
-   1. 내 Azure IoT Hub 의 URL 주소
+   2. Device Provisioning Service(DPS) 인스턴스의 Scope ID
+   3. 내 Azure IoT Hub 의 URL 주소
    
    ![](images/manifest.png)
    
@@ -63,41 +58,35 @@
    
    ![](images/ok-log.png)
 
-    > Azure IoT Hub is the core PaaS that enable reliable and secure bidirectional communications between millions of IoT devices and a cloud solution. It exposes service API for user to integrate your own business backend for data analystic, storage and show. In this Lab, we will use a tool called **Device Explorer Tool** to simulate an user application to sink data and control IoT device.
-    
     > Azure IoT Hub 는 수백만의 IoT 디바이스와 클라우드 솔루션 사이의 안정적인 양방향 보안 통신을 위한 핵심의 PaaS 
     솔루션입니다.
     사용자를 위한 서비스 API 연결을 통해 데이터 분석을 위한 비즈니스 백엔드, 저장소, 시각화 등을 구현할 수 있게 합니다.
     이 실습에서 **Device Explorer** 라는 툴을 사용하여 가상의 사용자 어플리케이션으로 데이터 확인과 IoT 디바이스 제어를 할 수 있습니다.
 
-6. Download and install [DeviceExplorer.msi](https://github.com/Azure/azure-iot-sdk-csharp/releases/download/2019-1-4/SetupDeviceExplorer.msi), a tool write in C# and Azure IoT Service SDK for C#.
+
 6. [DeviceExplorer.msi](https://github.com/Azure/azure-iot-sdk-csharp/releases/download/2019-1-4/SetupDeviceExplorer.msi)을 다운로드하고 설치합니다.
 
-7. Go to your IoT Hub portal and find the iothubowner policy's connection string under **shared access policies** setting, click the icon to copy.
 7. 내 IoT Hub 포탈로 갑니다. Policy 항목에서 iothubowner 의 **shared access policies** 설정에서 connection string을 확인합니다. 해당 아이콘을 클릭하여 복사합니다.
 
 
    ![](images/connection-string.png)
 
-8. Open **DevcieExplorer** and paste connection string to the dialog, click **update** to get access to IoT Hub. 
+
 8. *DevcieExplorer** 를 실행 후 Configuration 탭의 입력 창에 Connection string 을 붙여넣기 합니다. **update** 를 눌러 IoT Hub에 연결합니다. 
    
    ![](images/deviceexplorer.png)
 
-9. Go to *Data* tab, ensure the right device is selected and click **Update** button to start monitoring D2C message from device
 
 9. *Data* 탭으로 이동하여, 해당 디바이스 ID를 선택 후  **Update** 버튼을 클릭하여 디바이스에서 오는 D2C(Device to Cloud) 메세지를 확인합니다.
    
    ![](images/data.png)
-
-10.  Cloud to device control is implemented through the Device Twin mechanism in this lab. Go to *management* tab and select your device in the tab, click **Twin Props** button will open the Device Twin window.
 
 10. 이번 실습에서 Cloud to Device(C2D) 제어는 Device Twin 방식을 통해 구현되었습니다. *Management* 탭으로 이동하여 디바이스를 선택 후 **Twin Props** 버튼을 클릭하면 Device Twin 창이 나타납니다.
 
 
     ![](images/management.png)
 
-11. In Device Twin window, add a property `"StatusLED":{"value":true}` under the `"desired"` property and click **Send (use Json format)** button to update the Device Twin. Your device will be notified for this property change and light LED1 on board accordingly.  
+
 11. Device Twin 창에서 `"desired"` 속성 아래에 `"StatusLED":{"value":true}` 속성을 추가하고, **Send (use Json format)** 버튼을 눌러 Device Twin을 업데이트합니다. 해당 디바이스는 이 속성 값 변경이 알려지고 보드는 이에따라 LED1 을 켭니다. 
 
     ![](images/twin.png)

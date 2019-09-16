@@ -1,37 +1,26 @@
-#include "bme280_uesr.h"
+app_manifest.json
+"Gpio": [ "$MT3620_GPIO0", "$SAMPLE_BUTTON_1", "$SAMPLE_BUTTON_2", "$SAMPLE_LED" ],
 
 
+#include "..\AzureIoT\DHTlib.h"
 
-bme280_component_config(SAMPLE_LSM6DS3_I2C);
-
-	
 
 if (iothubAuthenticated) {
     //SendSimulatedTemperature();
-    SendBME280Data();
+    SendDHTData();
     IoTHubDeviceClient_LL_DoWork(iothubClientHandle);
 }
 
 
 
-void SendBME280Data(void)
+void SendDHTData(void)
 {
-    struct bme280_data sensordata;
-    bme280_component_getdata(&sensordata);
+	DHT_SensorData* pDHT = DHT_ReadData(MT3620_GPIO0);
 
-    char tempBuffer[20];
-    int len = snprintf(tempBuffer, 20, "%0.2f", sensordata.temperature);
-    if (len > 0) {
-        SendTelemetry("Temperature", tempBuffer);
-    }
-
-    len = snprintf(tempBuffer, 20, "%0.2f", sensordata.pressure * 0.01);
-    if (len > 0) {
-        SendTelemetry("Pressure", tempBuffer);
-    }
-
-    len = snprintf(tempBuffer, 20, "%0.2f", sensordata.humidity);
-    if (len > 0) {
-        SendTelemetry("Humidity", tempBuffer);
-    }
+	char tempBuffer[20];
+	
+	int len = snprintf(tempBuffer, 20, "%0.2f", pDHT->TemperatureCelsius);
+	if (len > 0) {
+		SendTelemetry("Temperature", tempBuffer);
+	}
 }

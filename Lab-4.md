@@ -4,98 +4,136 @@
 
 ## 목적
 
-- UART API / 실제센서 DHT-11/22 붙여보기
-- Direct Method 한 번 해보자
-- Direct Method 는 IoT Central 에서 지원 안하지 않나
-- IoT Hub 에서만 지원?
-- Hands-on with Azure IoT Central configuration
-- Understand the basic feature of IoT Central offered as a IoT SaaS solution
-- Get familiar with I2C API to connect to external sensor device
-- Use Azure Sphere and Azure IoT Central work together to build a secured end-to-end solution with telemtery collection, visulization and remote control ability.
+- Azure IoT Central 설정을 실습해봅니다.
+- IoT SaaS 솔루션으로서 IoT Central 이 제공하는 기본 기능들을 이해할 수 있습니다.
+- Azure Sphere 와 Azure IoT Central 을 같이 사용하여 원격데이터 수집, 시각화 그리고 원격제어를 보안의 end-to-end 솔루션으로 구현할 수 있습니다.
+- DHT-22 센서를 연결하여 실제 데이터를 원격에서 확인할 수 있습니다.
 
 ## 단계
 
-1. After connect Azure Sphere development board to your PC, enable device debug and disable OTA in Azure Sphere utility by:
+1.  Azure Sphere 개발보드를 PC에 연결하고 Azure Sphere utility 에서 디바이스를 디버그 모드로 전환합니다. (OTA는 비활성화)
    
-   `azsphere device prep-debug`
+    `azsphere device prep-debug`
 
-2. Make sure WiFi credential is configured and Azure Sphere is connected to AP. If Lab-2 and Lab-3 are skipped, follow Step 1) and 2) in [Ove-The-Air upgrade](Lab-2.md) to setup.
+2. 아래의 절차대로 Wi-Fi credential 이 설정되었는지 확인하고 Azure Sphere 를 AP에 연결합니다.
+
+  - Wi-Fi SSID 와 패스워드를 설정하고 Azure Sphere 디바이스를 Azure Sphere 보안 서비스에 연결하도록 합니다.   
+   `azsphere device wifi add --ssid <yourSSID> --key <yourNetworkKey>`
    
-3. Follow [Setup IoT Central](https://docs.microsoft.com/en-us/azure-sphere/app-development/setup-iot-central) page to setup cloud resources, the key steps are:
+   > - 보안설정이 없는 Wi-Fi 네트워크 연결에서는 --key 플래그를 생략합니다.
+   > - 만약 SSID 나 패스워드에 스페이스가 있는 경우는 " "처리 합니다. e.g. --ssid "My iPhone"
+
+ -  아래의 커맨드로 AP에 연결되었는지 Wi-Fi 상태를 확인할 수 있습니다.
+   
+    `azsphere device wifi show-status`
+
+
+    ![](images/show-wifi-status.png)
     
-    - Create Azure IoT Central Application
-    - Upload tenant CA certificate to IoT Central and finish Proof of Procession
+    
+   
+3. [Setup IoT Central](https://docs.microsoft.com/ko-kr/azure-sphere/app-development/setup-iot-central) 페이지를 통해 cloud resourc 들을 설정합니다. 주요 단계는 아래와 같습니다.
 
-4. Go to your application in [Azure IoT Central](https://apps.azureiotcentral.com/) and click **Create Device Templates** on the home page, select **Custom** to start a blank template. Give a name to your template and click **Create** button. 
+    - Azure IoT Central Application 을 추가합니다.
+    - Tenant CA 인증서를 IoT Central에 업로드하고 검증절차를 마무리합니다.
+
+4. [Azure IoT Central](https://apps.azureiotcentral.com/) 의 내 어플리케이션으로 가서 홈페이지에 있는 **Create Device Templates** 을 클릭한 후, **Custom** 을 선택하여 빈 템플릿으로 시작합니다. 사용할 이름을 입력하고 **Create** 버튼을 눌러 추가합니다. 
 
     ![](images/AzureSphereTemplate.png)
    
-5. Click **+ New** button and select **Telemetry**
+5. **+ New** 버튼을 누르고 **Telemetry** 를 선택합니다.
    
-   1. Set the Display Name and Field Name to **Temperature**. The Field Name must exactly match the name in the sample code, so this value is case-sensitive. Set Units to Degrees, and set the Minimum Value and Maximum Value to -40 and 85, respectively. Then click Save.
+   1. Display Name 과 Field Name 을 **Temperature**로 합니다.
+   Field Name은 샘플 코드에 있는 이름과 정확히 일치해야만 하므로 대소문자에 유의합니다. 단위는 Degrees로 하고 최소 / 최대값은 각각 -40 과 85 로 설정합니다. Save를 클릭하여 저장합니다.
 
-   2. Set one more telemetry **Humidity**, set range and unit to 0% to 100%
-   3. Set one more telemetry **Pressure**, set range and unit to 300 to 1100 hPa
+   2. 같은 방법으로 **Humidity** 를 추가합니다. 범위와 단위는 각각 0% 에서 100% 로 합니다.
+   
+   3. 같은 방법으로 **Pressure** 를 추가합니다. 범위와 단위는 각각 300 에서 1100hPa 로 합니다.
 
-6. Click **+ New** button and select **Event**, Set the Display Name and Field Name to **ButtonPress**. Then click Save. 
+
+6. **+ New** 버튼을 클릭하고 **Event**를 선택합니다. Display Name 과 Field Name 을 **ButtonPress** 로 합니다. Save를 클릭하여 저장합니다.
 
     ![](images/template.png)
 
-7. On the left Side Navigation select **Devices**, click + to add a new device, and select **Real** from the drop-down menu. A dialog will prompt to ask for Device ID and Name.
+7. 창의 왼쪽에서 디바이스를 선택한 다음 **+** 를 누르고 **Real** 을 선택하여 새로운 디바이스를 추가합니다. Device ID 와 Device Name 을 묻는 대화창이 나타납니다.
 
     ![](images/Realdevice.png)
 
-8. In an Azure Sphere Developer Command Prompt, type the following command:
+8. Azure Sphere Developer Command Prompt에서 아래의 커맨드를 입력합니다.
    
    `powershell -Command ((azsphere device show-attached)[0] -split ': ')[1].ToLower()`
 
-   Copy the lowercase device ID and paste it into the Device ID field of the Create New Device dialog box. Device name will be changed automatically using the device ID appended. Click **Create** button.
+   소문자로 출력된 Device ID 를 복사하여 대화창의 Device ID 항목에 붙여넣기 합니다. Device Name은 자동으로 Device ID에 맞게 변경됩니다. **Create** 버튼을 클릭합니다.
 
-9. Open a solution in Visual Studio and navigate to the folder of 0*.\azure-sphere-samples\Samples\AzureIoT*, open AzureIoT.sln solution file. Before build the project, there're three key information you need provide to the applicaton in app_manifest.json file.
+9. Visual Studio에서 'Open a project or solution'을 클릭합니다.
+`.\azure-sphere-samples\Samples\AzureIoT` 폴더를 연 후, *AzureIoT.sln* 솔루션 파일을 선택합니다. 프로젝트를 빌드하기 전에 3가지 필수 정보를 *app_manifest.json* 파일에 입력을 해줍니다.
    
-   - The Tenant ID for your Azure Sphere device
-   - The Scope ID for your Azure IoT Central application
-   - The IoT hub URL for your Azure IoT Central application 
+   - Azure Sphere 디바이스의 Tenant ID   
+   - Azure IoT Central 어플리케이션의 Scope ID   
+   - Azure IoT Central 어플리케이션의 IoT Hub URL 주소
 
-    Tenant ID can be retrieve from Azure Sphere command line utility by
+    Tenant ID 는 아래의 Azure Sphere CLI 커맨드를 통해서 얻을 수 있습니다.
+
     `azsphere tenant show-selected`
 
     ![](images/tenant.png)
 
-    To get Scope ID and IoT Hub URL, there is a assist tool in *.\azure-sphere-samples\Samples\AzureIoT\Tools* folder can help. In Azure Sphere command line utility, goo to above location, and run `ShowIoTCentralConfig.exe`, input 'Y' and login with your credential if needed. 
+    Scope ID 와 IoT Hub URL 을 쉽게 얻을 수 있는 툴이 *.\azure-sphere-samples\Samples\AzureIoT\Tools* 폴더에 있습니다. Azure Sphere 커맨드 라인 유틸리티에서 해당 폴더로 이동한 후, `ShowIoTCentralConfig.exe`를 실행하고, 'Y'를 입력합니다. 만약 로그인 창이 뜨면 내 Credential로 로그인합니다.
 
     ![](images/ShowIoTCentralConfig.png)
 
-    Fill these information in app_manifest.json file as below:
+        
+    출력된 정보들을 *app_manifest.json* 파일에 아래와 같이 추가해줍니다.
 
     ![](images/central_manifest.png)
 
-10. Connect BME280 sensor board to I2C pin of ISU2 on Azure Sphere Development board. They're 4 pins: VCC, GND, SDA and SCL. The CSB and SDO pin on sensor board can be left unconnected.
+10. 아래의 그림대로 DHT-22 센서를 Azure Sphere 개발보드에 연결합니다. VCC, GND, DATA 세 개의 핀을 정확히 연결합니다.
 
-    ![](images/MT3620_DVB_I2C.png)
+    ![](images/DHT-22-0.png)
+    ![](images/DHT-22-1.png)
+    ![](images/DHT-22-2.png)
 
-11. Grant ISU2 I2C access permission to applicaiton in app_manifest.json. The ISU2 I2C is described as **SAMPLE_LSM6DS3_i2C** in sample_hardware.json hardware definition file. We just use this name for simplicity.
+11. GPIO0 접근 권한을 어플리케이션에 주기위해 app_manifest.json 파일을 수정합니다. GPIO0 은 "$MT3620_GPIO0" 으로 수동으로 추가할 수 있습니다.
     
-    ![](images/i2c.png)
+    ![](images/DHT-22-3.png)
 
-12. By default the Azure IoT sample project send simulated temperature sensor data to Azure IoT. Hack the code to visualize your real world data!
+12. DHT-22 드라이버를 ..\AzureIoT 폴더에 복사하고 솔루션에 추가해줍니다.
 
-    > BME280 driver is provided in Code/Lab-4 folder. There're only two API exposed in bme280_uesr.h will be needed by your application. 
+    > DHT-22 드라이버는 Code/Lab-4 폴더에 있습니다. 
     
     ```
-    int bme280_component_config (int isu_port);
-    int bme280_component_getdata(struct bme280_data* pData);
+    #include "..\AzureIoT\DHTlib.h"
     ```
 
-13. Since I2C is still a [BETA](https://docs.microsoft.com/en-us/azure-sphere/app-development/use-beta) feature in current Azure Sphere SDK. We need select **2+Beta1905** as target API set in **Project->Azure IoT Property Pages** before build the project.
+13. 가상의 데이터를 보내는 부분을 실제 데이터로 보내도록 수정합니다.
+    ```
+    if (iothubAuthenticated) {
+    //SendSimulatedTemperature();
+    SendDHTData();
+    IoTHubDeviceClient_LL_DoWork(iothubClientHandle);
+    }
+    ```
     
-    ![](images/i2cabi.png)
+    
+    ```
+    void SendDHTData(void)
+    {
+	DHT_SensorData* pDHT = DHT_ReadData(MT3620_GPIO0);
+
+	char tempBuffer[20];
+	
+	int len = snprintf(tempBuffer, 20, "%0.2f", pDHT->TemperatureCelsius);
+	if (len > 0) {
+		SendTelemetry("Temperature", tempBuffer);
+	    }
+    }
+    ```
 
 14. Press F5 to build and run the applicaiton. Go to the device dashboard to check your data.
 
     ![](images/datapreview.png)
 
-15. Follow this [page](https://github.com/xiongyu0523/azure-sphere-samples/blob/master/Samples/AzureIoT/IoTCentral.md#add-new-measurements-settings-and-properties) to configure IoT Central application to visulize a state `Orientation` report from device and use toggle setting to control LED1.
+15. 링크 [page](https://github.com/Azure/azure-sphere-samples/blob/master/Samples/AzureIoT/IoTCentral.md#add-new-measurements-settings-and-properties) 로 이동하여 디바이스에서 report 된 'Orientation' 상태를 시각화하고 토글 설정을 사용하여 LED1을 제어하도록 IoT Central 애플리케이션을 구성합니다.
 
 ## 더 보기
 

@@ -25,15 +25,7 @@
 - `azsphere device recover` 로 최적의 Azure Sphere OS 버젼으로 디바이스 복구
 - [Git](https://git-scm.com/download/win) 설치 및 PATH 추가
 
-
-# 실습
-
-- [Lab-1 Blinking LED](Lab-1.md)
-- [Lab-2 Application Over-the-Air deployment](Lab-2.md)
-- [Lab-3 Connect to Azure IoT Hub](Lab-3.md)
-- [Lab-4 Visualize real world data on Azure IoT Central](Lab-4.md)
-
-# New 
+# 실습 
 - [Lab-2 IoT Hub Connection / Uplink Scenario](Lab-2.md)
 - [Lab-3 IoT Central Connection](Lab-3.md)
 - [Lab-4 Visualize real world data on Azure IoT Central](Lab-4.md)

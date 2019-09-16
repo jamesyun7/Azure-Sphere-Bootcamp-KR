@@ -90,7 +90,7 @@
 
     ![](images/datapreview.png)
 
-1. Follow this [page](https://github.com/xiongyu0523/azure-sphere-samples/blob/master/Samples/AzureIoT/IoTCentral.md#add-new-measurements-settings-and-properties) to configure IoT Central application to visulize a state `Orientation` report from device and use toggle setting to control LED1.
+1. 링크 [page](https://github.com/Azure/azure-sphere-samples/blob/master/Samples/AzureIoT/IoTCentral.md#add-new-measurements-settings-and-properties) 로 이동하여 디바이스에서 report 된 'Orientation' 상태를 시각화하고 토글 설정을 사용하여 LED1을 제어하도록 IoT Central 애플리케이션을 구성합니다.
 
 ## 더 보기
 

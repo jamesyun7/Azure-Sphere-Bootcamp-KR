@@ -42,7 +42,6 @@
 
    ![](images/chip-sku.png)
 
-7. After a successful build, Visual Studio package your applicaiton with metadata into a *.imagepackage* file for deployment. Upload it to Azure Sphere Security Service and automatically create the component that represent your specific application by:
 7. 어플리케이션 빌드가 성공적으로 끝나면, Visual Studio는 어플리케이션에 메타데이터를 포함하여 *.imagepackage*파일로 패키징합니다. 아래 커맨드는 이것을 AS3에 업로드하고 내 특정 어플리케이션을 나타내는 *component* 를 자동으로 생성합니다.
    
    `azsphere component image add --autocreatecomponent --filepath <file_path>`
