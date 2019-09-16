@@ -94,6 +94,12 @@ image set 이름은 현재 tenant 안에서 고유한 것을 사용합니다.
 
     `azsphere component publish --feedid <feed-GUID> --imagepath <file-path>`
 
+## 도전
+
+link-feed 를 활용해 더 쉬운 방법으로 시도해봅니다.
+> azsphere device link-feed 작업이 이 작업을 수행하는 가장 쉬운 방법입니다. 새 피드를 만들거나 기존 피드에 연결할 수 있습니다.
+[page](https://docs.microsoft.com/ko-kr/azure-sphere/deployment/link-to-feed)
+
 ## 더 보기
 - [Azure Sphere OS networking requirements](https://docs.microsoft.com/en-us/azure-sphere/network/ports-protocols-domains)
 - [Deloyment basics](https://docs.microsoft.com/en-us/azure-sphere/deployment/deployment-concepts)

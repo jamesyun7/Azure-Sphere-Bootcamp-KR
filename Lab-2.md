@@ -97,6 +97,8 @@
 
 > LED2 의 BLUE 색상은 **GPIO17**에 연결되어 있고, *SAMPLE_RGBLED_BLUE* 로 하드웨어 정의 파일에 정의되어 있습니다.
 
+> Visual Studio 의 Cloud Explorer 를 통해서 D2C message 를 모니터링 해봅니다.
+
 ## 더 보기
 - [Azure Sphere Application Manifest](https://docs.microsoft.com/ko-kr/azure-sphere/app-development/app-manifest)
 - [Provisioning device with Azure IoT Hub DPS](https://docs.microsoft.com/ko-kr/azure/iot-dps/about-iot-dps)
