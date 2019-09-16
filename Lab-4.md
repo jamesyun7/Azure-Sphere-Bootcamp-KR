@@ -129,7 +129,7 @@
     }
     ```
 
-14. Press F5 to build and run the applicaiton. Go to the device dashboard to check your data.
+14. F5 를 눌러 빌드하고 어플리케이션을 실행합니다. Azure IoT Central 디바이스 대시보드로 이동하여 데이터를 확인합니다.
 
     ![](images/datapreview.png)
 
