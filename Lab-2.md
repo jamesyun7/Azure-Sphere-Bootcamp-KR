@@ -6,7 +6,6 @@
 - Azure Sphere 에 Wi-Fi 네트워크 설정하는 것을 익힐 수 있습니다.
 - Azure IoT Hub 설정을 익힐 수 있습니다.
 - Azure Sphere device 가 어떻게 Azure IoT Hub & DPS 를 통해 등록되는지 이해할 수 있습니다.
-- Understand Azure IoT Hub Device to Cloud message and Device Twin
 - Device Twin 과 Azure IoT Hub Device to message Azure 를 이해할 수 있습니다. 
 - Azure IoT C device SDK API 의 기본사용에 익숙해질 수 있습니다.
 
@@ -14,9 +13,7 @@
 
 1. [Setup IoT Hub](https://docs.microsoft.com/ko-kr/azure-sphere/app-development/setup-iot-hub) 페이지에 따라 아래의 절차대로 클라우드 자원을 설정합니다.     
     - Azure IoT Hub 와 DPS(Device Provisioning Service)를 생성하고 서로 연결합니다.
-    - Upload tenant CA certificate to DPS and finish Proof of Procession
     - Tenant CA 인증서를 DPS에 업로드하고 검증절차를 완료합니다.
-    - Add a enrollment group in DPS to provision Azure Sphere devices
     - Azure Sphere 디바이스를 등록하기 위해 DPS에 Enrollment 그룹을 추가합니다.
 
     > - Azure IoT Hub DPS 서비스는 무료구독으로 사용할 수 없습니다. 실습에서는 Pay-as-you-go 구독으로 사용합니다.
