@@ -118,13 +118,22 @@
     ```
     void SendDHTData(void)
     {
-	DHT_SensorData* pDHT = DHT_ReadData(MT3620_GPIO0);
+	    DHT_SensorData* pDHT=DHT_ReadData(MT3620_GPIO0);
 
-	char tempBuffer[20];
+	    char tempBuffer[20], humiBuffer[20];
+
+	    if (pDHT != NULL)
+	    {
 	
-	int len = snprintf(tempBuffer, 20, "%0.2f", pDHT->TemperatureCelsius);
-	if (len > 0) {
-		SendTelemetry("Temperature", tempBuffer);
+		    int len = snprintf(tempBuffer, 20, "%0.2f", pDHT->TemperatureCelsius);
+		    if (len > 0) {
+			    SendTelemetry("Temperature", tempBuffer);
+		    }
+
+		    len = snprintf(humiBuffer, 20, "%0.2f", pDHT->Humidity);
+		    if (len > 0) {
+			SendTelemetry("Humidity", humiBuffer);
+		    }
 	    }
     }
     ```
