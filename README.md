@@ -21,7 +21,6 @@
 - `azsphere tenant select -i <tenant id>` 로 Azure Sphere tenant 선택
 
 - (새보드만 해당) `azsphere device claim` 을 통해 사용자의 tenant 에 디바이스를 클레임
-- Device is recovered by `azsphere device recover` command to have a knowning good Azure Sphere OS.
 - `azsphere device recover` 로 최적의 Azure Sphere OS 버젼으로 디바이스 복구
 - [Git](https://git-scm.com/download/win) 설치 및 PATH 추가
 
