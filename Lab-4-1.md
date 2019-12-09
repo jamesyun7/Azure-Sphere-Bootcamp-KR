@@ -1,4 +1,4 @@
-# Lab-3: Azure IoT Central 연결하기
+# Lab-4: 실제 데이터를 Azure IoT Hub와 Azure IoT Central과 연동하기
 
 - [Home Page](README.md)로 돌아가기
 
@@ -7,6 +7,7 @@
 - Azure IoT Central 설정을 실습해봅니다.
 - IoT SaaS 솔루션으로서 IoT Central 이 제공하는 기본 기능들을 이해할 수 있습니다.
 - Azure Sphere 와 Azure IoT Central 을 같이 사용하여 원격데이터 수집, 시각화 그리고 원격제어를 보안의 end-to-end 솔루션으로 구현할 수 있습니다.
+- [Azure Sphere Starter Kit](https://www.avnet.com/shop/us/products/avnet-engineering-services/aes-ms-mt3620-sk-g-3074457345636825680/) 의 센서로 실제 데이터를 원격에서 확인할 수 있습니다.
 
 ## 단계
 
@@ -86,17 +87,114 @@
 
     ![](images/central_manifest.png)
 
-10. F5 를 눌러 빌드하고 어플리케이션을 실행합니다. Azure IoT Central 디바이스 대시보드로 이동하여 데이터를 확인합니다.
+10. Azure Sphere Starter Kit 의 센서는 아래와 같이 연결되어 있습니다.
+
+    ![](images/SK_SENSOR1.png)
+
+11. ADC0 접근 권한을 어플리케이션에 주기위해 app_manifest.json 파일을 수정합니다. 아래와 같이 ADC 항목 안에 "$SAMPLE_POTENTIOMETER_ADC_CONTROLLER" 으로 추가합니다.
+    
+    ![](images/ADC1.png)
+
+12. Beta 기능인 ADC 를 사용하기 위해서는 CMakeSettings.json 을 더블클릭하여 아래와 같이 ``3+Beta1909`` API Library set 으로 설정해주어야 합니다.
+
+    ![](images/3+Beta1909.png)
+
+
+13. 가상 데이터를 보내는 부분을 실제 데이터로 보내도록 main.c 를 수정합니다.
+    
+    ```
+    #include <applibs/adc.h> //추가
+    ```
+
+    ```
+    //InitPeripheralsAndHandlers() 에 아래 ADC 설정 추가
+
+    adcControllerFd = ADC_Open(SAMPLE_POTENTIOMETER_ADC_CONTROLLER);
+	if (adcControllerFd < 0) {
+		Log_Debug("ADC_Open failed with error: %s (%d)\n", strerror(errno), errno);
+		return -1;
+	}
+
+	sampleBitCount = ADC_GetSampleBitCount(adcControllerFd, SAMPLE_POTENTIOMETER_ADC_CHANNEL);
+	if (sampleBitCount == -1) {
+		Log_Debug("ADC_GetSampleBitCount failed with error : %s (%d)\n", strerror(errno), errno);
+		return -1;
+	}
+	if (sampleBitCount == 0) {
+		Log_Debug("ADC_GetSampleBitCount returned sample size of 0 bits.\n");
+		return -1;
+	}
+
+	int result = ADC_SetReferenceVoltage(adcControllerFd, SAMPLE_POTENTIOMETER_ADC_CHANNEL,
+		sampleMaxVoltage);
+	if (result < 0) {
+		Log_Debug("ADC_SetReferenceVoltage failed with error : %s (%d)\n", strerror(errno), errno);
+		return -1;
+	}
+
+
+    ```
+
+    ```
+    if (iothubAuthenticated) {
+    //SendSimulatedTemperature();
+    SendDHTData();
+    IoTHubDeviceClient_LL_DoWork(iothubClientHandle);
+    }
+    ```
+    
+    
+    ```
+    void SendSensorData(void)
+    {
+	    uint32_t value;
+        int result = ADC_Poll(adcControllerFd, SAMPLE_POTENTIOMETER_ADC_CHANNEL, &value);
+        if (result < -1) {
+            Log_Debug("ADC_Poll failed with error: %s (%d)\n", strerror(errno), errno);
+            terminationRequired = true;
+            return;
+        }
+
+	// get voltage (2.5*adc_reading/4096)
+	// divide by 3650 (3.65 kohm) to get current (A)
+	// multiply by 1000000 to get uA
+	// divide by 0.1428 to get Lux (based on fluorescent light Fig. 1 datasheet)
+	// divide by 0.5 to get Lux (based on incandescent light Fig. 1 datasheet)
+	// We can simplify the factors, but for demostration purpose it's OK
+
+        float voltage = ((float)value * sampleMaxVoltage) / (float)((1 << sampleBitCount) - 1);
+        float light_sensor = ((float)value * 2.5 / 4095) * 1000000 / (3650 * 0.1428);//James
+        Log_Debug("The out sample value is %.3f V\n", voltage);
+        Log_Debug("The Light sample value is %.3f lux\n", light_sensor);
+        
+        char tempBuffer[20], luxBuffer[20], pressureBuffer[20], axlBufferX[20], axlBufferY[20], axlBufferZ[20], angBufferX[20], angBufferY[20], angBufferZ[20]; 
+
+        int len = snprintf(luxBuffer, 20, "%0.3f", light_sensor);
+        if (len > 0) {
+            SendTelemetry("Light Sensor", luxBuffer);
+        }
+    }
+    ```
+
+14. F5 를 눌러 빌드하고 어플리케이션을 실행합니다. Azure IoT Central 디바이스 대시보드로 이동하여 데이터를 확인합니다.
+
+    ![](images/luxValue.png)
 
     ![](images/datapreview.png)
 
-1. 링크 [page](https://github.com/Azure/azure-sphere-samples/blob/master/Samples/AzureIoT/IoTCentral.md#add-new-measurements-settings-and-properties) 로 이동하여 디바이스에서 report 된 'Orientation' 상태를 시각화하고 토글 설정을 사용하여 LED1을 제어하도록 IoT Central 애플리케이션을 구성합니다.
+## 도전
+
+> 버튼을 눌렀을 때 센서값을 보내도록 수정해봅니다.
+
+> 다른 MEMS 센서들도 추가해봅니다. LSMDSO (6-Axis Axl. Gyro), LPS22HH(대기압)
 
 ## 더 보기
 
-- [What is Azure IoT Central](https://docs.microsoft.com/ko-kr/azure/iot-central/overview-iot-central)
-- [Azure IoT Central Architecture](https://docs.microsoft.com/ko-kr/azure/iot-central/concepts-architecture)
-- [Use I2C with Azure Sphere](https://docs.microsoft.com/ko-kr/azure-sphere/app-development/i2c)
-- [Manage target hardware dependencies](https://docs.microsoft.com/ko-kr/azure-sphere/app-development/manage-hardware-dependencies)
+- [What is Azure IoT Central](https://docs.microsoft.com/en-us/azure/iot-central/overview-iot-central)
+- [Azure IoT Central Architecture](https://docs.microsoft.com/en-us/azure/iot-central/concepts-architecture)
+- [Use I2C with Azure Sphere](https://docs.microsoft.com/en-us/azure-sphere/app-development/i2c)
+- [Manage target hardware dependencies](https://docs.microsoft.com/en-us/azure-sphere/app-development/manage-hardware-dependencies)
+
+
 
 

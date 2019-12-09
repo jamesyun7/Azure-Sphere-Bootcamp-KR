@@ -14,7 +14,7 @@
 
 ## Quick check list:
 - FTDI 드라이버가 설치되고, 장치관리자에 3개의 COM 포트가 인식되었는지 확인
-- 최신 버젼의 [Visual Studio](https://www.visualstudio.com/) 와 [Azure Sphere SDK](https://aka.ms/AzureSphereHardware) 설치
+- 최신 버젼의 [Visual Studio](https://www.visualstudio.com/) 와 [Visual Studio용 Azure Sphere SDK](https://docs.microsoft.com/ko-kr/azure-sphere/install/install-sdk) 설치
 - Azure 계정 등록 후 무료 구독 및 pay-as-you-go 구독 추가
 - Azure Sphere CLI 의 `azsphere login` 를 이용해 로그인
 - 기존 tenant 가 없는 경우 `azsphere tenant create -n <tenant name>` 를 이용해 Azure Sphere tenant 생성
@@ -26,7 +26,8 @@
 
 # 실습
 - [Lab-1 LED Blink](Lab-1.md) 
-- [Lab-2 IoT Hub Connection / Uplink Scenario](Lab-2.md)
+- [Lab-2 IoT Hub Connection / Uplink / Downlink ](Lab-2.md)
 - [Lab-3 IoT Central Connection](Lab-3.md)
-- [Lab-4 Visualize real world data on Azure IoT Central](Lab-4.md)
+- [Lab-4 Visualize real world data on Azure IoT Central - MT3620 RDB](Lab-4.md)
+- [Lab-4 Visualize real world data on Azure IoT Central - Avnet Starter Kit](Lab-4-1.md)
 - [Lab-5 Application Over-the-Air deployment](Lab-5.md)

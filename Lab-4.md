@@ -13,14 +13,14 @@
 
 1.  Azure Sphere 개발보드를 PC에 연결하고 Azure Sphere utility 에서 디바이스를 디버그 모드로 전환합니다. (OTA는 비활성화)
    
-    `azsphere device prep-debug`
+    `azsphere device enable-development`
 
 2. 아래의 절차대로 Wi-Fi credential 이 설정되었는지 확인하고 Azure Sphere 를 AP에 연결합니다.
 
   - Wi-Fi SSID 와 패스워드를 설정하고 Azure Sphere 디바이스를 Azure Sphere 보안 서비스에 연결하도록 합니다.   
-   `azsphere device wifi add --ssid <yourSSID> --key <yourNetworkKey>`
+   `azsphere device wifi add --ssid <yourSSID> --psk <yourNetworkKey>`
    
-   > - 보안설정이 없는 Wi-Fi 네트워크 연결에서는 --key 플래그를 생략합니다.
+   > - 보안설정이 없는 Wi-Fi 네트워크 연결에서는 --psk 플래그를 생략합니다.
    > - 만약 SSID 나 패스워드에 스페이스가 있는 경우는 " "처리 합니다. e.g. --ssid "My iPhone"
 
  -  아래의 커맨드로 AP에 연결되었는지 Wi-Fi 상태를 확인할 수 있습니다.
@@ -32,7 +32,7 @@
     
     
    
-3. [Setup IoT Central](https://docs.microsoft.com/ko-kr/azure-sphere/app-development/setup-iot-central) 페이지를 통해 cloud resourc 들을 설정합니다. 주요 단계는 아래와 같습니다.
+3. [Setup IoT Central](https://docs.microsoft.com/ko-kr/azure-sphere/app-development/setup-iot-central) 페이지를 통해 cloud resource 들을 설정합니다. 주요 단계는 아래와 같습니다.
 
     - Azure IoT Central Application 을 추가합니다.
     - Tenant CA 인증서를 IoT Central에 업로드하고 검증절차를 마무리합니다.

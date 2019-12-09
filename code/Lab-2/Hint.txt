@@ -20,3 +20,17 @@ if (BlueLedState != NULL) {
     GPIO_SetValue(deviceTwinStatusBlueLedGpioFd, (statusLedOn == true ? GPIO_Value_Low : GPIO_Value_High));
     TwinReportBoolState("BLUE_LED", statusLedOn);
 }
+
+
+/*
+// for Property // copy below
+{
+  "properties": {
+    "desired": {
+      "StatusLED": {
+        "value": true
+       }
+     }
+   }
+}
+*/
