@@ -81,13 +81,14 @@ Build message 에서 image 파일 경로를 확인할 수 있습니다.
    
 12. Wi-Fi 가 잘 연결되어 있는지 다시 한 번 확인하고 보드를 리셋하면 잠시 뒤 OTA 배포가 완료되어 LED가 깜박이는 것을 볼 수 있습니다.
 
-13. 한 번 *feed* 를 활성화하면, 그 뒤 새로운 image 를 배포하는 건 꽤 간단해집니다. 내 어플리케이션을 약간 수정해서 빌드한 다음 아래 커맨드를 실행해보고 보드에서 어떻게 되는지 지켜봅니다.
 
-    `azsphere component publish --feedid <feed-GUID> --imagepath <file-path>`
+13. 한 번 배포를 설정하면, 그 뒤 새로운 image 를 배포하는 건 꽤 간단해집니다. 내 어플리케이션을 약간 수정해서 빌드한 후 같은 커맨드로 새 이미지패키지를 배포합니다.
+
+       `azsphere device-group deployment create --devicegroupname "Field Test" --productname AvnetSK --filepath "C:/work/azure-sphere-samples/Samples/GPIO/GPIO_HighLevelApp/out/ARM-Debug-3/GPIO_HighLevelApp2019.12.09.19.40.imagepackage"`
 
 ## 도전
 
-Hardware 파일을 mt3620_rdb 에서 avnet_mt3620_sk 로 변경 후 BLUE LED 가 깜박이도록 새로운 어플리케이션을 빌드하고 OTA 배포에 적용해봅니다.
+다른 색의 LED 가 깜박이도록 새로운 어플리케이션을 빌드하고 OTA 배포에 적용해봅니다.
 
 ![](images/deployment1.png)
 
