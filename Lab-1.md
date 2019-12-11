@@ -45,7 +45,8 @@ LED의 BLUE 색상을 ON/OFF 해봅니다.
 
 > MT3620 RDB의 경우 LED2 의 BLUE 색상은 **GPIO17**에 연결되어 있고, *SAMPLE_RGBLED_BLUE* 로 하드웨어 정의 파일에 정의되어 있습니다.
 
-> Starter Kit의 경우 USER LED의 BLUE 색상은 **GPIO10** 에 연결되어 있고, *$MT3620_GPIO10* 으로 manifest 파일에 추가할 수도 있습니다.
+> Starter Kit의 경우 USER LED의 BLUE 색상은 **GPIO10** 에 연결되어 있고,
+ 기본 하드웨어 정의 파일인 경우 *$MT3620_GPIO10* 혹은 *$MT3620_RDB_LED1_BLUE* 으로 manifest 파일에 추가할 수도 있습니다.
 
 > 하드웨어 정의파일을 Starter Kit 으로 변경하고 manifest 파일과 어플리케이션도 변경해봅니다.(**avnet_mt3620_sk**)
 

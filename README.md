@@ -16,13 +16,28 @@
 - FTDI 드라이버가 설치되고, 장치관리자에 3개의 COM 포트가 인식되었는지 확인
 - 최신 버젼의 [Visual Studio](https://www.visualstudio.com/) 와 [Visual Studio용 Azure Sphere SDK](https://docs.microsoft.com/ko-kr/azure-sphere/install/install-sdk) 설치
 - Azure 계정 등록 후 무료 구독 및 pay-as-you-go 구독 추가
-- Azure Sphere CLI 의 `azsphere login` 를 이용해 로그인
+- Azure Sphere CLI 의 `azsphere login` 를 이용해 로그인 혹은 `azsphere login --newuser <MS account>` 로 계정 추가
 - 기존 tenant 가 없는 경우 `azsphere tenant create -n <tenant name>` 를 이용해 Azure Sphere tenant 생성
 - `azsphere tenant select -i <tenant id>` 로 Azure Sphere tenant 선택
 
 - (새보드만 해당) `azsphere device claim` 을 통해 사용자의 tenant 에 디바이스를 클레임
 - `azsphere device recover` 로 최적의 Azure Sphere OS 버젼으로 디바이스 복구
 - [Git](https://git-scm.com/download/win) 설치 및 PATH 추가
+
+
+# 하드웨어
+실습은 MT3620_RBD 혹은 AVNET_MT3620_SK 보드를 사용할 수 있습니다.
+
+## MT3620_RDB
+자세한 정보는 [azure-sphere-hardware-designs](https://github.com/Azure/azure-sphere-hardware-designs) 에서 확인 가능합니다.
+
+![](images/RDB.png)
+
+## AVNET_MT3620_SK
+자세한 정보는 [링크](https://www.element14.com/community/community/designcenter/azure-sphere-starter-kits)에서 확인 가능합니다.
+
+![](images/AzureSphereKit_front.png)
+
 
 # 실습
 - [Lab-1 LED Blink](Lab-1.md) 
@@ -31,3 +46,9 @@
 - [Lab-4 Visualize real world data on Azure IoT Central - MT3620 RDB](Lab-4.md)
 - [Lab-4 Visualize real world data on Azure IoT Central - Avnet Starter Kit](Lab-4-1.md)
 - [Lab-5 Application Over-the-Air deployment](Lab-5.md)
+
+
+# Sample Code Disclaimer
+Sample code – No Warranties THE SAMPLE CODE SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY. TO THE MAXIMUM EXTENT PERMITTED BY LAW, MICROSOFT DISCLAIMS ANY AND ALL OTHER WARRANTIES, WHETHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT, OR FITNESS FOR A PARTICULAR PURPOSE, WHETHER ARISING BY A COURSE OF DEALING, USAGE OR TRADE PRACTICE OR COURSE OF PERFORMANCE. In no event shall Microsoft, its licensors, the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the software or the use thereof.
+
+This code may contain errors and/or may not operate correctly. Microsoft undertakes no duty to correct any errors or update the software. Your use of this code is optional and subject to any license provided therewith or referenced therein, if any. Microsoft does not provide you with any license or other rights to any Microsoft product or service through the code provided to you.

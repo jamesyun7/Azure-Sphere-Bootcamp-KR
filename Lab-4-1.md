@@ -186,7 +186,10 @@
 
 > 버튼을 눌렀을 때 센서값을 보내도록 수정해봅니다.
 
-> 다른 MEMS 센서들도 추가해봅니다. LSMDSO (6-Axis Axl. Gyro), LPS22HH(대기압)
+> 다른 MEMS 센서들도 추가해봅니다. LSMDSO (6-Axis Axl. Gyro), LPS22HH(대기압) 이 경우 5번 항목에서 aX, aY, aZ, gX, gY, gZ 와 pressure 를 디바이스 템플릿의 telemetry 에 추가해줍니다.
+Hint 를 참조합니다. i2cDevice.c, lps22hh_reg.c and lsm6dso_reg.c를 추가하기 위해 CMakeLists.txt 파일을 수정해야 합니다.
+    ![](images/avnetsensor.png)
+
 
 ## 더 보기
 
