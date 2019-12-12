@@ -136,15 +136,18 @@
     ```
 
     ```
+    // AzureTimerEventHandler() 에서 수정
+
     if (iothubAuthenticated) {
     //SendSimulatedTemperature();
-    SendDHTData();
+    SendSensorData();
     IoTHubDeviceClient_LL_DoWork(iothubClientHandle);
     }
     ```
     
     
     ```
+    // 추가
     void SendSensorData(void)
     {
 	    uint32_t value;
