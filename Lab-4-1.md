@@ -105,6 +105,15 @@
     ```
     #include <applibs/adc.h> //추가
     ```
+    ```
+    static int adcControllerFd = -1;
+
+    // The size of a sample in bits
+    static int sampleBitCount = -1;
+
+    // The maximum voltage
+    static float sampleMaxVoltage = 2.5f;
+    ```
 
     ```
     //InitPeripheralsAndHandlers() 에 아래 ADC 설정 추가
