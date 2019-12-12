@@ -183,7 +183,7 @@
 
         int len = snprintf(luxBuffer, 20, "%0.3f", light_sensor);
         if (len > 0) {
-            SendTelemetry("Light Sensor", luxBuffer);
+            SendTelemetry("LightSensor", luxBuffer);
         }
     }
     ```
