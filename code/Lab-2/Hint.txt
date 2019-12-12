@@ -1,36 +1,163 @@
-static int deviceTwinStatusBlueLedGpioFd = -1;
+static int DirectMethodCall(const char* methodName, const char* payload, size_t payloadSize, char** responsePayload, size_t* responsePayloadSize);
 
 
 
-
-
-Log_Debug("Opening SAMPLE_RGBLED_BLUE as output\n");
-deviceTwinStatusBlueLedGpioFd = GPIO_OpenAsOutput(SAMPLE_RGBLED_BLUE, GPIO_OutputMode_PushPull, GPIO_Value_High);
-if (deviceTwinStatusBlueLedGpioFd < 0) {
-    Log_Debug("ERROR: Could not open LED: %s (%d).\n", strerror(errno), errno);
-    return -1;
-}
-
-
-
-
-JSON_Object* BlueLedState = json_object_dotget_object(desiredProperties, "BLUE_LED");
-if (BlueLedState != NULL) {
-    statusLedOn = (bool)json_object_get_boolean(BlueLedState, "value");
-    GPIO_SetValue(deviceTwinStatusBlueLedGpioFd, (statusLedOn == true ? GPIO_Value_Low : GPIO_Value_High));
-    TwinReportBoolState("BLUE_LED", statusLedOn);
-}
-
-
-/*
-// for Property // copy below
+static void SetupAzureClient(void)
 {
-  "properties": {
-    "desired": {
-      "StatusLED": {
-        "value": true
-       }
-     }
-   }
+
+
+//
+//
+//
+//
+//
+
+// Put end of a function
+IoTHubDeviceClient_LL_SetDeviceMethodCallback(iothubClientHandle, DirectMethodCall, NULL);
+
+
+
+
+/// <summary>
+///     Allocates and formats a string message on the heap.
+/// </summary>
+/// <param name="messageFormat">The format of the message</param>
+/// <param name="maxLength">The maximum length of the formatted message string</param>
+/// <returns>The pointer to the heap allocated memory.</returns>
+static void* SetupHeapMessage(const char* messageFormat, size_t maxLength, ...)
+{
+	va_list args;
+	va_start(args, maxLength);
+	char* message =
+		malloc(maxLength + 1); // Ensure there is space for the null terminator put by vsnprintf.
+	if (message != NULL) {
+		vsnprintf(message, maxLength, messageFormat, args);
+	}
+	va_end(args);
+	return message;
 }
-*/
+
+
+/// <summary>
+///     Direct Method callback function, called when a Direct Method call is received from the Azure
+///     IoT Hub.
+/// </summary>
+/// <param name="methodName">The name of the method being called.</param>
+/// <param name="payload">The payload of the method.</param>
+/// <param name="responsePayload">The response payload content. This must be a heap-allocated
+/// string, 'free' will be called on this buffer by the Azure IoT Hub SDK.</param>
+/// <param name="responsePayloadSize">The size of the response payload content.</param>
+/// <returns>200 HTTP status code if the method name is "LedColorControlMethod" and the color is
+/// correctly parsed;
+/// 400 HTTP status code is the color has not been recognised in the payload;
+/// 404 HTTP status code if the method name is unknown.</returns>
+static int DirectMethodCall(const char* methodName, const char* payload, size_t payloadSize,
+	char** responsePayload, size_t* responsePayloadSize)
+{
+	// Prepare the payload for the response. This is a heap allocated null terminated string.
+	// The Azure IoT Hub SDK is responsible of freeing it.
+	*responsePayload = NULL;  // Reponse payload content.
+	*responsePayloadSize = 0; // Response payload content size.
+
+	int result = 404; // HTTP status code.
+
+	if (strcmp(methodName, "Hello") != 0) {
+		result = 404;
+		Log_Debug("INFO: Method not found called: '%s'.\n", methodName);
+
+		static const char noMethodFound[] = "\"method not found '%s'\"";
+		size_t responseMaxLength = sizeof(noMethodFound) + strlen(methodName);
+		*responsePayload = SetupHeapMessage(noMethodFound, responseMaxLength, methodName);
+		if (*responsePayload == NULL) {
+			Log_Debug("ERROR: Could not allocate buffer for direct method response payload.\n");
+			abort();
+		}
+		*responsePayloadSize = strlen(*responsePayload);
+		return result;
+	}
+
+	// Method name is identified.
+	result = 200;
+
+	Log_Debug("INFO: Method called: '%s'.\n", methodName);
+
+	static const char colorOkResponse[] =
+		"{ \"success\" : true, \"message\" : \"Hello ack %s\" }";
+	size_t responseMaxLength = sizeof(colorOkResponse) + strlen(payload);
+	*responsePayload = SetupHeapMessage(colorOkResponse, responseMaxLength);
+	if (*responsePayload == NULL) {
+		Log_Debug("ERROR: Could not allocate buffer for direct method response payload.\n");
+		abort();
+	}
+	*responsePayloadSize = strlen(*responsePayload);
+
+	return result;
+
+	/*
+	//RgbLedUtility_Colors ledColor = RgbLedUtility_Colors_Unknown;
+	// The payload should contains JSON such as: { "color": "red"}
+	char* directMethodCallContent = malloc(payloadSize + 1); // +1 to store null char at the end.
+	if (directMethodCallContent == NULL) {
+		Log_Debug("ERROR: Could not allocate buffer for direct method request payload.\n");
+		abort();
+	}
+
+	memcpy(directMethodCallContent, payload, payloadSize);
+	directMethodCallContent[payloadSize] = 0; // Null terminated string.
+	JSON_Value* payloadJson = json_parse_string(directMethodCallContent);
+	if (payloadJson == NULL) {
+		goto colorNotFound;
+	}
+	JSON_Object* colorJson = json_value_get_object(payloadJson);
+	if (colorJson == NULL) {
+		goto colorNotFound;
+	}
+	const char* colorName = json_object_get_string(colorJson, "color");
+	if (colorName == NULL) {
+		goto colorNotFound;
+	}
+
+	//ledColor = RgbLedUtility_GetColorFromString(colorName, strlen(colorName));
+
+	// If color's name has not been identified.
+	if (ledColor == RgbLedUtility_Colors_Unknown) {
+		goto colorNotFound;
+	}
+
+	// Color's name has been identified.
+	result = 200;
+	const char* colorString = RgbLedUtility_GetStringFromColor(ledColor);
+	Log_Debug("INFO: LED color set to: '%s'.\n", colorString);
+	// Set the blinking LED color.
+	ledBlinkColor = ledColor;
+
+	static const char colorOkResponse[] =
+		"{ \"success\" : true, \"message\" : \"led color set to %s\" }";
+	size_t responseMaxLength = sizeof(colorOkResponse) + strlen(payload);
+	*responsePayload = SetupHeapMessage(colorOkResponse, responseMaxLength, colorString);
+	if (*responsePayload == NULL) {
+		Log_Debug("ERROR: Could not allocate buffer for direct method response payload.\n");
+		abort();
+	}
+	*responsePayloadSize = strlen(*responsePayload);
+
+	return result;
+
+colorNotFound:
+	result = 400; // Bad request.
+	Log_Debug("INFO: Unrecognised direct method payload format.\n");
+
+	static const char noColorResponse[] =
+		"{ \"success\" : false, \"message\" : \"request does not contain an identifiable "
+		"color\" }";
+	responseMaxLength = sizeof(noColorResponse);
+	*responsePayload = SetupHeapMessage(noColorResponse, responseMaxLength);
+	if (*responsePayload == NULL) {
+		Log_Debug("ERROR: Could not allocate buffer for direct method response payload.\n");
+		abort();
+	}
+	*responsePayloadSize = strlen(*responsePayload);
+
+	return result;
+	*/
+}
