@@ -64,8 +64,10 @@
 
    소문자로 출력된 Device ID 를 복사하여 대화창의 Device ID 항목에 붙여넣기 합니다. Device Name은 자동으로 Device ID에 맞게 변경됩니다. **Create** 버튼을 클릭합니다.
 
-9. Visual Studio에서 'Open a project or solution'을 클릭합니다.
-`.\azure-sphere-samples\Samples\AzureIoT` 폴더를 연 후, *AzureIoT.sln* 솔루션 파일을 선택합니다. 프로젝트를 빌드하기 전에 3가지 필수 정보를 *app_manifest.json* 파일에 입력을 해줍니다.
+9. Visual Studio 를 실행하여 `File - Open - CMake...` 를 차례로 클릭합니다.
+   `.\azure-sphere-samples\Samples\AzureIoT` 폴더를 선택 후 CMakeLists.txt 를 선택합니다.
+
+   ![](images/open_CMake_AzureIoT.png)
    
    - Azure Sphere 디바이스의 Tenant ID   
    - Azure IoT Central 어플리케이션의 Scope ID   
