@@ -30,8 +30,16 @@
 
    ![](images/createProduct.png)
    
-4. Product 를 추가하면 기본적으로 5개의 Device group 이 생성됩니다.
+3. Product 를 추가하면 기본적으로 5개의 Device group 이 생성됩니다.
 
+    |  Device Group Name       | App Update  | OS Update | 
+    |  ----------------        | ----------  | --------- | 
+    | Development              | Disabled    | Retail Evaluation OS |
+    | Field Test               | Enabled     | Retail OS |
+    | Field Test OS Evaluation | Enabled     | Retail Evaluation OS |
+    | Production               | Enabled     | Retail OS |
+    | Production OS Evaluation | Enabled     | Retail Evaluation OS |
+    
     - Development 디바이스 그룹은 클라우드 애플리케이션 업데이트를 사용하지 않도록 설정하고 Retail Evaluation OS를 제공합니다.
     
     - Field Test 는 클라우드 애플리케이션 업데이트를 사용하도록 설정하고 Retail OS를 제공합니다.
@@ -42,11 +50,11 @@
 
     - Field Test OS Evaluation 은 클라우드 애플리케이션 업데이트를 사용하도록 설정하고 Retail Evaluation OS를 제공합니다.
 
-     필요한 경우 아래 명령을 통해 추가로 생성할 수 있지만, 본 실습에서는 사용하지 않습니다.
+    필요한 경우 아래 명령을 통해 디바이스 그룹을 추가로 생성할 수 있습니다. 이후 추가 (옵션) 과정에서 진행하도록 합니다.
 
     `azsphere device-group create --name <device-group-name>`
 
-5. 이전 과정까지는 `azsphere device enable-development` 를 이용한 개발모드를 사용했기 때문에 클라우드 모드로 전환합니다.
+4. 이전 과정까지는 `azsphere device enable-development` 를 이용한 개발모드를 사용했기 때문에 OTA 업데이트를 위한 클라우드 모드로 전환합니다.
 
      아래 커맨드는 기존 어플리케이션을 삭제하고 디버그 모드를 해제합니다. 이제 디바이스는 오직 Azure Sphere Security Service(이하 AS3)에서 production-signed 이미지만 허용합니다.
 
@@ -58,17 +66,17 @@
 
     이 시점에서 기존에 로드된 어플리케이션 동작이 없어진 것을 볼 수 있습니다.
 
-6. 배포에 사용할 어플리케이션 빌드가 성공적으로 끝나면, Visual Studio는 어플리케이션에 메타데이터를 포함하여 .imagepackage파일로 패키징합니다.
+5. 배포에 사용할 어플리케이션 빌드가 성공적으로 끝나면, Visual Studio는 어플리케이션에 메타데이터를 포함하여 .imagepackage파일로 패키징합니다.
 Build message 에서 image 파일 경로를 확인할 수 있습니다.
 
     ![](images/imagePath.png)
 
-    > 아래와 같이 현재 날짜와 시간을 image-set 이름 뒤에 붙여서 사용하면 실습 시 구분에        도움이 됩니다.    
-        ImageSet-GPIOHighLevelApp-2019.12.09.19.00
+    > 아래와 같이 현재 날짜와 시간을 image-set 이름 뒤에 붙여서 사용하면 실습 시 구분에   도움이 됩니다.    
+        ImageSet-GPIOHighLevelApp-2020.05.26.14.00
 
-7.아래 예제 커맨드는 이 파일을 디바이스 그룹에 배포합니다.
+6. 아래 예제 커맨드는 이 파일을 디바이스 그룹에 배포합니다.
    
-   `azsphere device-group deployment create --devicegroupname "Field Test" --productname AvnetSK --filepath "C:/work/azure-sphere-samples/Samples/GPIO/GPIO_HighLevelApp/out/ARM-Debug-3/GPIO_HighLevelApp2019.12.09.19.00.imagepackage"`
+   `azsphere device-group deployment create --devicegroupname "Field Test" --productname AvnetSK --filepath "C:/work/azure-sphere-samples/Samples/GPIO/GPIO_HighLevelApp/out/ARM-Debug-3/GPIO_HighLevelApp2020.05.26.14.00.imagepackage"`
 
    - `<file_path>`파라메터는 " " 기호 안에 imagepackage 파일의 절대경로로 입력 되어야 합니다.  
         
@@ -79,16 +87,39 @@ Build message 에서 image 파일 경로를 확인할 수 있습니다.
         ![](images/component-id.png)
 
    
-12. Wi-Fi 가 잘 연결되어 있는지 다시 한 번 확인하고 보드를 리셋하면 잠시 뒤 OTA 배포가 완료되어 LED가 깜박이는 것을 볼 수 있습니다.
+7. Wi-Fi 가 잘 연결되어 있는지 다시 한 번 확인하고 보드를 리셋하면 잠시 뒤 OTA 배포가 완료되어 LED가 깜박이는 것을 볼 수 있습니다.
 
 
-13. 한 번 배포를 설정하면, 그 뒤 새로운 image 를 배포하는 건 꽤 간단해집니다. 내 어플리케이션을 약간 수정해서 빌드한 후 같은 커맨드로 새 이미지패키지를 배포합니다.
+8. 한 번 배포를 설정하면, 그 뒤 새로운 image 를 배포하는 건 꽤 간단해집니다. 내 어플리케이션을 약간 수정해서 빌드한 후 같은 커맨드로 새 이미지패키지를 배포합니다.
 
-       `azsphere device-group deployment create --devicegroupname "Field Test" --productname AvnetSK --filepath "C:/work/azure-sphere-samples/Samples/GPIO/GPIO_HighLevelApp/out/ARM-Debug-3/GPIO_HighLevelApp2019.12.09.19.40.imagepackage"`
+       `azsphere device-group deployment create --devicegroupname "Field Test" --productname AvnetSK --filepath "C:/work/azure-sphere-samples/Samples/GPIO/GPIO_HighLevelApp/out/ARM-Debug-3/GPIO_HighLevelApp2020.05.26.14.20.imagepackage"`
+
+9. (옵션) 아래의 커맨드로 다른 디바이스 그룹을 추가할 수 있습니다. 파라메터로 유저 어플리케이션 업데이트와 운영체제 업데이트 종류를 관리할 수 있습니다.
+
+    `azsphere device-group create --name <device-group-name>  --productname <product-name> --osfeed Retail --applicationupdate On --description <your-description> `
+
+10. (옵션) 이 디바이스 그룹에 다른 어플리케이션 배포를 추가합니다. 6번 과정과 같은 커맨드이지만 다른 디바이스 그룹을 적용합니다.
+
+     `azsphere device-group deployment create --productname <name of product> --devicegroupname <device-group-name> --filepath <path to imagepackage>`
+
+11. (옵션) 원격으로 내 디바이스를 다른 디바이스 그룹으로 옮기는 커맨드는 아래와 같습니다.
+
+     `azsphere device update --deviceid <your-device-id> --productname <product-name> --devicegroupname <device-group-name>`
+
+     내 디바이스 ID 는 아래의 커맨드로 확인이 가능합니다.
+
+     `azsphere device show-attached`
+
+     이 경우 그냥 두면 내 디바이스는 24시간 안에 업데이트 되거나 reboot 시 버젼을 확인하고 즉시 새 어플리케이션으로 업데이트 됩니다. 실습에서는 빠른 확인을 위해 리셋버튼을 누르도록 합니다.
+     
 
 ## 도전
 
 다른 색의 LED 가 깜박이도록 새로운 어플리케이션을 빌드하고 OTA 배포에 적용해봅니다.
+
+유저 RGB LED 는 각 3개의 GPIO 에 할당되어 있습니다. 녹색과 파란색으로 변경해서 빌드해보고 OTA 를 배포하여 다른 LED로 변경되는지 확인해봅니다.
+
+ > 칩 레벨 abstraction 인 'MT3620_GPIO9' 혹은 'MT3620_GPIO10' 으로 쉽게 MT3620_RDB 와 AVNET_MT3620_SK 보드에서 변경이 가능합니다.
 
 ![](images/deployment1.png)
 
