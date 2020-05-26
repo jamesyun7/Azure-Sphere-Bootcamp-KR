@@ -42,12 +42,12 @@
 
 
 # 실습
-- [Lab-1 LED Blink](Lab-1.md) 
-- [Lab-2 IoT Hub Connection / Uplink / Downlink ](Lab-2.md)
-- [Lab-3 IoT Central Connection](Lab-3.md)
-- [Lab-4 Visualize real world data on Azure IoT Central - MT3620 RDB](Lab-4.md)
-- [Lab-4 Visualize real world data on Azure IoT Central - Avnet Starter Kit](Lab-4-1.md)
-- [Lab-5 Application Over-the-Air deployment](Lab-5.md)
+- [Lab-1 : LED Blink](Lab-1.md) 
+- [Lab-2 : Application Over-The-Air deployment ](Lab-2.md)
+- [Lab-3 : IoT Central Connection](Lab-3.md)
+- [Lab-4 : Visualize real world data on Azure IoT Central - MT3620 RDB](Lab-4.md)
+- [Lab-4 : Visualize real world data on Azure IoT Central - Avnet Starter Kit](Lab-4-1.md)
+- [Option Lab : IoT Hub Connection / Uplink / Downlink](Lab-5.md)
 
 
 # Sample Code Disclaimer

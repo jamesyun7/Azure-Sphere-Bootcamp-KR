@@ -1,16 +1,28 @@
-# Lab-5: Over-the-Air로 어플리케이션 배포하기
+# Option Lab : Azure IoT Hub 에 연결하기
 
-- [Home Page](README.md)로 돌아가기
+- [Home Page](README.md) 로 돌아가기
 
 ## 목적
-
 - Azure Sphere 에 Wi-Fi 네트워크 설정하는 것을 익힐 수 있습니다.
-- Azure Sphere 유틸리티를 통해 어플리케이션을 Over-The-Air로 배포하는 방법을 배울 수 있습니다.
-- Over-The-Air 배포를 이해하는데 필요한 모든 컨셉을 이해할 수 있습니다.
-  
+- Azure IoT Hub 설정을 익힐 수 있습니다.
+- Azure Sphere device 가 어떻게 Azure IoT Hub & DPS 를 통해 등록되는지 이해할 수 있습니다.
+- Device Twin 과 Azure IoT Hub Device to message Azure 를 이해할 수 있습니다. 
+- Azure IoT C device SDK API 의 기본사용에 익숙해질 수 있습니다.
+
 ## 단계
 
-1. 아래의 절차대로 Wi-Fi credential 이 설정되었는지 확인하고 Azure Sphere 를 AP에 연결합니다.
+1. [Setup IoT Hub](https://docs.microsoft.com/ko-kr/azure-sphere/app-development/setup-iot-hub) 페이지에 따라 아래의 절차대로 클라우드 자원을 설정합니다.     
+    - [Azure IoT Hub 와 DPS(Device Provisioning Service)를 생성](https://docs.microsoft.com/ko-kr/azure/iot-dps/quick-setup-auto-provision)하고 서로 연결합니다.
+    - [Tenant CA 인증서를 DPS에 업로드하고 검증절차](https://docs.microsoft.com/ko-kr/azure-sphere/app-development/setup-iot-hub#step-2-download-the-tenant-authentication-ca-certificate)를 완료합니다.
+    - Azure Sphere 디바이스를 등록하기 위해 DPS에 Enrollment 그룹을 추가합니다.
+
+    > ~~- Azure IoT Hub DPS 서비스는 무료구독으로 사용할 수 없습니다. 실습에서는 Pay-as-you-go 구독으로 사용합니다.~~
+
+2. Azure Sphere 개발보드를 PC에 연결하고 Azure Sphere utility 에서 디바이스를 디버그 모드로 전환합니다. (OTA는 비활성화됨)    
+   `azsphere device enable-development`
+
+3. 아래의 절차대로 Wi-Fi credential 이 설정되었는지 확인하고 Azure Sphere 를 AP에 연결합니다.
+
 
 - Wi-Fi SSID 와 패스워드를 설정하고 Azure Sphere 디바이스를 Azure Sphere 보안 서비스에 연결하도록 합니다.   
    `azsphere device wifi add --ssid <yourSSID> --psk <yourNetworkKey>`
@@ -23,109 +35,86 @@
    `azsphere device wifi show-status`
 
     ![](images/show-wifi-status.png)
-    
-2. *product* 를 추가하고 고유의 이름을 할당합니다. Description 파라메터는 옵션이므로 필수는 아닙니다.
 
-   `azsphere product create --name <product-name> --description <optional-desc>`
+4. Visual Studio 를 실행하여 `File - Open - CMake...` 를 차례로 클릭합니다.
+   `.\azure-sphere-samples\Samples\AzureIoT` 폴더를 선택 후 CMakeLists.txt 를 선택합니다.
 
-   ![](images/createProduct.png)
+   ![](images/open_CMake_AzureIoT.png)
+
+   프로젝트를 빌드하기 전에 3가지 필수 정보를 *app_manifest.json* 파일에 입력을 해줍니다.
+
+   1. Azure Sphere 디바이스의 Tenant ID
+   2. Device Provisioning Service(DPS) 인스턴스의 Scope ID
+   3. 내 Azure IoT Hub 의 URL 주소
    
-3. Product 를 추가하면 기본적으로 5개의 Device group 이 생성됩니다.
-
-    |  Device Group Name       | App Update  | OS Update | 
-    |  ----------------        | ----------  | --------- | 
-    | Development              | Disabled    | Retail Evaluation OS |
-    | Field Test               | Enabled     | Retail OS |
-    | Field Test OS Evaluation | Enabled     | Retail Evaluation OS |
-    | Production               | Enabled     | Retail OS |
-    | Production OS Evaluation | Enabled     | Retail Evaluation OS |
-    
-    - Development 디바이스 그룹은 클라우드 애플리케이션 업데이트를 사용하지 않도록 설정하고 Retail Evaluation OS를 제공합니다.
-    
-    - Field Test 는 클라우드 애플리케이션 업데이트를 사용하도록 설정하고 Retail OS를 제공합니다.
-
-    - Production 은 클라우드 애플리케이션 업데이트를 사용하도록 설정하고 Retail OS를 제공합니다.
-
-    - Production OS Evaluation 은 클라우드 애플리케이션 업데이트를 사용하도록 설정하고 Retail Evaluation OS를 제공합니다.
-
-    - Field Test OS Evaluation 은 클라우드 애플리케이션 업데이트를 사용하도록 설정하고 Retail Evaluation OS를 제공합니다.
-
-    필요한 경우 아래 명령을 통해 디바이스 그룹을 추가로 생성할 수 있습니다. 이후 추가 (옵션) 과정에서 진행하도록 합니다.
-
-    `azsphere device-group create --name <device-group-name>`
-
-4. 이전 과정까지는 `azsphere device enable-development` 를 이용한 개발모드를 사용했기 때문에 OTA 업데이트를 위한 클라우드 모드로 전환합니다.
-
-     아래 커맨드는 기존 어플리케이션을 삭제하고 디버그 모드를 해제합니다. 이제 디바이스는 오직 Azure Sphere Security Service(이하 AS3)에서 production-signed 이미지만 허용합니다.
-
-    `azsphere device enable-cloud-test --productname <your-product> --devicegroupname <devicegroup>`
-
-    --devicegroupname 을 생략하면 기본적으로 Field Test 디바이스 그룹으로 할당됩니다.
-
-    ![](images/enable-cloud-test.png)
-
-    이 시점에서 기존에 로드된 어플리케이션 동작이 없어진 것을 볼 수 있습니다.
-
-5. 배포에 사용할 어플리케이션 빌드가 성공적으로 끝나면, Visual Studio는 어플리케이션에 메타데이터를 포함하여 .imagepackage파일로 패키징합니다.
-Build message 에서 image 파일 경로를 확인할 수 있습니다.
-
-    ![](images/imagePath.png)
-
-    > 아래와 같이 현재 날짜와 시간을 image-set 이름 뒤에 붙여서 사용하면 실습 시 구분에   도움이 됩니다.    
-        ImageSet-GPIOHighLevelApp-2020.05.26.14.00
-
-6. 아래 예제 커맨드는 이 파일을 디바이스 그룹에 배포합니다.
+   ![](images/manifest.png)
    
-   `azsphere device-group deployment create --devicegroupname "Field Test" --productname AvnetSK --filepath "C:/work/azure-sphere-samples/Samples/GPIO/GPIO_HighLevelApp/out/ARM-Debug-3/GPIO_HighLevelApp2020.05.26.14.00.imagepackage"`
+   해당 [링크](https://github.com/Azure/azure-sphere-samples/blob/master/Samples/AzureIoT/IoTHub.md#configure-the-sample-application-to-work-with-your-azure-iot-hub) 에서 위 정보들을 어떻게 얻는지 확인할 수 있습니다.
 
-   - `<file_path>`파라메터는 " " 기호 안에 imagepackage 파일의 절대경로로 입력 되어야 합니다.  
-        
-        ![](images/deployment.png)
+     > **중요!** 기존에 있던 **AllowedConnections** 의 DPS global endpoint: *global.azure-devices-provisioning.net* 를 **지우면 안됩니다**
 
-   - Component ID, Name 은 *app_manifest.json* 파일에서 정의됩니다. imagepackage 에 이 메타데이터가 포함됩니다.
-        
-        ![](images/component-id.png)
-
+5. **F5** 를 눌러 빌드 후 어플리케이션을 로드하면 디바이스가 IoT Hub에 성공적으로 연결된 후 가상의 원격 데이터를 보내는 것을 Output log창을 통해 확인할 수 있습니다.
    
-7. Wi-Fi 가 잘 연결되어 있는지 다시 한 번 확인하고 보드를 리셋하면 잠시 뒤 OTA 배포가 완료되어 LED가 깜박이는 것을 볼 수 있습니다.
+   ![](images/ok-log.png)
+
+    > Azure IoT Hub 는 수백만의 IoT 디바이스와 클라우드 솔루션 사이의 안정적인 양방향 보안 통신을 위한 핵심의 PaaS 
+    솔루션입니다.
+    사용자를 위한 서비스 API 연결을 통해 데이터 분석을 위한 비즈니스 백엔드, 저장소, 시각화 등을 구현할 수 있게 합니다.
+    이 실습에서 **Device Explorer** 라는 툴을 사용하여 가상의 사용자 어플리케이션으로 데이터 확인과 IoT 디바이스 제어를 할 수 있습니다.
 
 
-8. 한 번 배포를 설정하면, 그 뒤 새로운 image 를 배포하는 건 꽤 간단해집니다. 내 어플리케이션을 약간 수정해서 빌드한 후 같은 커맨드로 새 이미지패키지를 배포합니다.
+6. [DeviceExplorer.msi](https://github.com/Azure/azure-iot-sdk-csharp/releases/download/2019-1-4/SetupDeviceExplorer.msi)을 다운로드하고 설치합니다.
 
-       `azsphere device-group deployment create --devicegroupname "Field Test" --productname AvnetSK --filepath "C:/work/azure-sphere-samples/Samples/GPIO/GPIO_HighLevelApp/out/ARM-Debug-3/GPIO_HighLevelApp2020.05.26.14.20.imagepackage"`
+7. 내 IoT Hub 포탈로 갑니다. Policy 항목에서 iothubowner 의 **shared access policies** 설정에서 connection string을 확인합니다. 해당 아이콘을 클릭하여 복사합니다.
 
-9. (옵션) 아래의 커맨드로 다른 디바이스 그룹을 추가할 수 있습니다. 파라메터로 유저 어플리케이션 업데이트와 운영체제 업데이트 종류를 관리할 수 있습니다.
 
-    `azsphere device-group create --name <device-group-name>  --productname <product-name> --osfeed Retail --applicationupdate On --description <your-description> `
+   ![](images/connection-string.png)
 
-10. (옵션) 이 디바이스 그룹에 다른 어플리케이션 배포를 추가합니다. 6번 과정과 같은 커맨드이지만 다른 디바이스 그룹을 적용합니다.
 
-     `azsphere device-group deployment create --productname <name of product> --devicegroupname <device-group-name> --filepath <path to imagepackage>`
+8. *DevcieExplorer** 를 실행 후 Configuration 탭의 입력 창에 Connection string 을 붙여넣기 합니다. **update** 를 눌러 IoT Hub에 연결합니다. 
+   
+   ![](images/deviceexplorer.png)
 
-11. (옵션) 원격으로 내 디바이스를 다른 디바이스 그룹으로 옮기는 커맨드는 아래와 같습니다.
 
-     `azsphere device update --deviceid <your-device-id> --productname <product-name> --devicegroupname <device-group-name>`
+9. *Data* 탭으로 이동하여, 해당 디바이스 ID를 선택 후  **Update** 버튼을 클릭하여 디바이스에서 오는 D2C(Device to Cloud) 메세지를 확인합니다.
+   
+   ![](images/data.png)
 
-     내 디바이스 ID 는 아래의 커맨드로 확인이 가능합니다.
+10. 이번 실습에서 Cloud to Device(C2D) 제어는 Device Twin 방식을 통해 구현되었습니다. *Management* 탭으로 이동하여 디바이스를 선택 후 **Twin Props** 버튼을 클릭하면 Device Twin 창이 나타납니다.
 
-     `azsphere device show-attached`
 
-     이 경우 그냥 두면 내 디바이스는 24시간 안에 업데이트 되거나 reboot 시 버젼을 확인하고 즉시 새 어플리케이션으로 업데이트 됩니다. 실습에서는 빠른 확인을 위해 리셋버튼을 누르도록 합니다.
-     
+    ![](images/management.png)
+
+
+11. Device Twin 창에서 `"desired"` 속성 아래에 `"StatusLED":{"value":true}` 속성을 추가하고, **Send (use Json format)** 버튼을 눌러 Device Twin을 업데이트합니다. 해당 디바이스는 이 속성 값 변경이 알려지고 보드는 이에따라 LED1 을 켭니다.
+
+
+   ![](images/twin.png)
 
 ## 도전
 
-다른 색의 LED 가 깜박이도록 새로운 어플리케이션을 빌드하고 OTA 배포에 적용해봅니다.
+나만의 속성값을 Device Twin에 추가하고, 이것을 통해 LED의 BLUE 색상을 ON/OFF 해봅니다.
 
-유저 RGB LED 는 각 3개의 GPIO 에 할당되어 있습니다. 녹색과 파란색으로 변경해서 빌드해보고 OTA 를 배포하여 다른 LED로 변경되는지 확인해봅니다.
+> MT3620 RDB의 경우 LED2 의 BLUE 색상은 **GPIO17**에 연결되어 있고, *SAMPLE_RGBLED_BLUE* 로 하드웨어 정의 파일에 정의되어 있습니다.
 
- > 칩 레벨 abstraction 인 'MT3620_GPIO9' 혹은 'MT3620_GPIO10' 으로 쉽게 MT3620_RDB 와 AVNET_MT3620_SK 보드에서 변경이 가능합니다.
+> Starter Kit의 경우 USER LED의 BLUE 색상은 **GPIO10** 에 연결되어 있고, *$MT3620_RDB_LED1_BLUE* 으로 manifest 파일에 추가할 수도 있습니다.
 
-![](images/deployment1.png)
+> Visual Studio 의 Cloud Explorer 를 통해서 D2C message 를 모니터링 해봅니다.
+
+
+> Direct Method Call 을 적용해봅니다. 어려우면 Hint 를 사용합니다.
+
+![](images/directMethod.png)
+
+> Visual Studio 의 Cloud Explorer 를 통해서 Invoke Direct Method 를 해봅니다.
+![](images/directMethod1.png) 
+![](images/directMethod2.png)
+![](images/directMethod3.png)
 
 
 ## 더 보기
-- [Azure Sphere OS networking requirements](https://docs.microsoft.com/ko-kr/azure-sphere/network/ports-protocols-domains)
-- [Deloyment basics](https://docs.microsoft.com/ko-kr/azure-sphere/deployment/deployment-concepts)
-- [Creat a deployment](https://docs.microsoft.com/ko-kr/azure-sphere/deployment/create-a-deployment)
-- [Set up a device group for OS evaluation](https://docs.microsoft.com/ko-kr/azure-sphere/deployment/set-up-evaluation-device-group)
+- [Azure Sphere Application Manifest](https://docs.microsoft.com/ko-kr/azure-sphere/app-development/app-manifest)
+- [Provisioning device with Azure IoT Hub DPS](https://docs.microsoft.com/ko-kr/azure/iot-dps/about-iot-dps)
+- [IoT Hub D2C message](https://docs.microsoft.com/ko-kr/azure/iot-hub/iot-hub-devguide-messages-d2c)
+- [IoT Hub Device Twin](https://docs.microsoft.com/ko-kr/azure/iot-hub/iot-hub-devguide-device-twins)
+- [Azure IoT C SDK](https://github.com/Azure/azure-iot-sdk-c)
