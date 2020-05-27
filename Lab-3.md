@@ -36,42 +36,19 @@
     - Azure IoT Central Application 을 추가합니다.
     - Tenant CA 인증서를 IoT Central에 업로드하고 검증절차를 마무리합니다.
 
-4. [Azure IoT Central](https://apps.azureiotcentral.com/) 의 내 어플리케이션으로 가서 홈페이지에 있는 **Create Device Templates** 을 클릭한 후, **Custom** 을 선택하여 빈 템플릿으로 시작합니다. 사용할 이름을 입력하고 **Create** 버튼을 눌러 추가합니다. 
+4. [Azure IoT Central](https://apps.azureiotcentral.com/) 을 클릭하여 Microsoft 계정 혹은 Azure 계정으로 로그인 하고 **+New application** 을 클릭합니다.
 
-    ![](images/AzureSphereTemplate.png)
+5. [링크](https://github.com/Azure/azure-sphere-samples/blob/master/Samples/AzureIoT/IoTCentral.md#create-an-azure-iot-central-application) 로 이동하여 예제 가이드를 따릅니다. 절차는 아래와 같습니다.
+
+   - 새로운 IoT Central Application 추가
+   - 7일 무료 체험 사용
+   - 기본 제공 Azure Sphere 예제 Template 선택
+   - 기본 View 및 제어용 버튼 추가
+   - Scope ID / IoT Central App URL / Tenant ID 를 app_manifest 에 추가
+   - 예제 실행
+   - IoT Central 에서 디바이스를 해당 Template 으로 Migrate
+   - 온도값 / 버튼 / LED제어 / Alarm Method 확인
    
-5. **+ New** 버튼을 누르고 **Telemetry** 를 선택합니다.
-   
-   1. Display Name 과 Field Name 을 **Temperature**로 합니다.
-   Field Name은 샘플 코드에 있는 이름과 정확히 일치해야만 하므로 대소문자에 유의합니다. 단위는 Degrees로 하고 최소 / 최대값은 각각 -40 과 85 로 설정합니다. Save를 클릭하여 저장합니다.
-
-   2. 같은 방법으로 **Humidity** 를 추가합니다. 범위와 단위는 각각 0% 에서 100% 로 합니다.
-   
-   3. 같은 방법으로 **Pressure** 를 추가합니다. 범위와 단위는 각각 300 에서 1100hPa 로 합니다.
-
-
-6. **+ New** 버튼을 클릭하고 **Event**를 선택합니다. Display Name 과 Field Name 을 **ButtonPress** 로 합니다. Save를 클릭하여 저장합니다.
-
-    ![](images/template.png)
-
-7. 창의 왼쪽에서 디바이스를 선택한 다음 **+** 를 누르고 **Real** 을 선택하여 새로운 디바이스를 추가합니다. Device ID 와 Device Name 을 묻는 대화창이 나타납니다.
-
-    ![](images/Realdevice.png)
-
-8. Azure Sphere Developer Command Prompt에서 아래의 커맨드를 입력합니다.
-   
-   `powershell -Command ((azsphere device show-attached)[0] -split ': ')[1].ToLower()`
-
-   소문자로 출력된 Device ID 를 복사하여 대화창의 Device ID 항목에 붙여넣기 합니다. Device Name은 자동으로 Device ID에 맞게 변경됩니다. **Create** 버튼을 클릭합니다.
-
-9. Visual Studio 를 실행하여 `File - Open - CMake...` 를 차례로 클릭합니다.
-   `.\azure-sphere-samples\Samples\AzureIoT` 폴더를 선택 후 CMakeLists.txt 를 선택합니다.
-
-   ![](images/open_CMake_AzureIoT.png)
-   
-   - Azure Sphere 디바이스의 Tenant ID   
-   - Azure IoT Central 어플리케이션의 Scope ID   
-   - Azure IoT Central 어플리케이션의 IoT Hub URL 주소
 
     Tenant ID 는 아래의 Azure Sphere CLI 커맨드를 통해서 얻을 수 있습니다.
 
@@ -79,7 +56,7 @@
 
     ![](images/tenant.png)
 
-    Scope ID 와 IoT Hub URL 을 쉽게 얻을 수 있는 툴이 *.\azure-sphere-samples\Samples\AzureIoT\Tools* 폴더에 있습니다. Azure Sphere 커맨드 라인 유틸리티에서 해당 폴더로 이동한 후, `ShowIoTCentralConfig.exe`를 실행하고, 'Y'를 입력합니다. 만약 로그인 창이 뜨면 내 Credential로 로그인합니다.
+    Scope ID 와 IoT Hub URL 을 쉽게 얻을 수 있는 툴이 *.\azure-sphere-samples\Samples\AzureIoT\Tools* 폴더에 있습니다. Azure Sphere 커맨드 라인 유틸리티에서 해당 폴더로 이동한 후, `ShowIoTCentralConfig.exe`를 실행하고 위 링크의 가이드 대로 따릅니다.
 
     ![](images/ShowIoTCentralConfig.png)
 
@@ -88,11 +65,10 @@
 
     ![](images/central_manifest.png)
 
-10. F5 를 눌러 빌드하고 어플리케이션을 실행합니다. Azure IoT Central 디바이스 대시보드로 이동하여 데이터를 확인합니다.
+10. F5 를 눌러 빌드하고 어플리케이션을 실행합니다. Azure IoT Central 디바이스 탭으로 이동하여 디바이스를 Migrate 하고 데이터를 확인합니다.
 
-    ![](images/datapreview.png)
 
-1. 링크 [page](https://github.com/Azure/azure-sphere-samples/blob/master/Samples/AzureIoT/IoTCentral.md#add-new-measurements-settings-and-properties) 로 이동하여 디바이스에서 report 된 'Orientation' 상태를 시각화하고 토글 설정을 사용하여 LED1을 제어하도록 IoT Central 애플리케이션을 구성합니다.
+
 
 ## 더 보기
 
