@@ -34,13 +34,13 @@
 
     |  Device Group Name       | App Update  | OS Update | 
     |  ----------------        | ----------  | --------- | 
-    | Development              | Disabled    | Retail Evaluation OS |
+    | Development              | Disabled    | Retail OS |
     | Field Test               | Enabled     | Retail OS |
     | Field Test OS Evaluation | Enabled     | Retail Evaluation OS |
     | Production               | Enabled     | Retail OS |
     | Production OS Evaluation | Enabled     | Retail Evaluation OS |
     
-    - Development 디바이스 그룹은 클라우드 애플리케이션 업데이트를 사용하지 않도록 설정하고 Retail Evaluation OS를 제공합니다.
+    - Development 디바이스 그룹은 클라우드 애플리케이션 업데이트를 사용하지 않도록 설정하고 Retail OS를 제공합니다.
     
     - Field Test 는 클라우드 애플리케이션 업데이트를 사용하도록 설정하고 Retail OS를 제공합니다.
 
